@@ -15,7 +15,7 @@
 // TODO nf-core: Optional inputs are not currently supported by Nextflow. However, using an empty
 //               list (`[]`) instead of a file can be used to work around this issue.
 
-process VJDB_HASHDDEDUPLICATE {
+process VJDB_PREPAREUPDATE {
     label 'process_single'
     tag "${fasta}"
 
@@ -28,7 +28,7 @@ process VJDB_HASHDDEDUPLICATE {
     // TODO nf-core: Where applicable please provide/convert compressed files as input/output
     //               e.g. "*.fastq.gz" and NOT "*.fastq", "*.bam" and NOT "*.sam" etc.
     path fasta
-    path reps_fna // I think that it becomes optional 
+    path reps_fna
 
     output:
     // TODO nf-core: Named file extensions MUST be emitted for ALL output channels
@@ -56,12 +56,10 @@ process VJDB_HASHDDEDUPLICATE {
     // TODO nf-core: Please replace the example samtools command below with your module's command
     // TODO nf-core: Please indent the command appropriately (4 spaces!!) to help with readability ;)
     """
-    #!/usr/bin/env phthon
-    
-    vjdb \\
+    5_prepare_update.py \\
         $args \\
-        -@ $task.cpus \\
-        $bam
+        --new-seqs $fasta \\
+        --existing-reps $reps_fna
     """
 
     stub:
@@ -77,6 +75,7 @@ process VJDB_HASHDDEDUPLICATE {
     """
     echo $args
     
-    touch ${prefix}.bam
+    touch combined_for_vclust.fna.gz
+    touch new_hashed_reps.csv
     """
 }
