@@ -1,5 +1,4 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
-# # TODO nf-core: Add a description of the module and list keywords
 name: "virjendb_prepareupdate"
 description: write your description here
 keywords:
@@ -7,43 +6,51 @@ keywords:
   - virus
   - genomics
 tools:
-  ## TODO nf-core: Add a description and other details for the software below
   - "virjendb":
-      description: "Freely available tools for computational molecular biology."
+      description: "An integrative virus sequence database that connects researchers with publicly available virus sequence data and its metadata."
       homepage: "https://virjendb.org/"
       documentation: "https://github.com/maltesie/vjdb-clustering/README.md"
       tool_dev_url: "https://github.com/maltesie/vjdb-clustering"
       doi: "no DOI available"
-      licence: ["Biopython License Agreement"] ## @maltesie, please comment
+      licence: ["Biopython License Agreement"] ## TODO @maltesie, please comment
       identifier: ""
 
 input:
-  - bam:
+  - fna_gz:
       type: file
-      description: Sorted BAM/CRAM/SAM file
-      pattern: "*.{bam,cram,sam}"
+      description: GZipped FASTA nucleic acid file, containing new viral sequences
+      pattern: "*.{fna.gz}"
       ontologies:
-        - edam: http://edamontology.org/format_2572 # BAM
-        - edam: http://edamontology.org/format_2573 # CRAM
-        - edam: http://edamontology.org/format_3462 # SAM
+        - edam: http://edamontology.org/format_1929 # FASTA
+  - reps_fna_gz:
+      type: file
+      description: GZipped FASTA nucleic acid file, containing representative viral sequences from initial clustering
+      pattern: "*.{fna.gz}"
+      ontologies:
+        - edam: http://edamontology.org/format_1929 # FASTA
 output:
-  bam:
-    - "*.bam":
+  combined_reps_fna:
+    - "*.fna.gz":
         type: file
-        description: Sorted BAM/CRAM/SAM file
-        pattern: "*.{bam,cram,sam}"
+        description: GZipped FASTA nucleic acid file, containing existing reps and the deduplicated (via hash) new reps
+        pattern: "*.{fna.gz}"
         ontologies:
-          - edam: http://edamontology.org/format_2572 # BAM
-          - edam: http://edamontology.org/format_2573 # CRAM
-          - edam: http://edamontology.org/format_3462 # SAM
-  versions_vjdb:
+        - edam: http://edamontology.org/format_1929 # FASTA 
+  hashed_reps:
+    - "*.CSV":
+        type: file
+        description: CSV file containing the sequence ID, representative ID, GC content and length
+        pattern: "*.{csv}"
+        ontologies:
+        - edam: http://edamontology.org/format_3752 # CSV 
+  versions_biopython:
     - - ${task.process}:
           type: string
           description: The name of the process
-      - vjdb:
+      - biopython:
           type: string
           description: The name of the tool
-      - vjdb --version:
+      - python -c "import Bio; print(Bio.__version__)":
           type: eval
           description: The expression to obtain the version of the tool
 topics:
@@ -51,10 +58,10 @@ topics:
     - - ${task.process}:
           type: string
           description: The name of the process
-      - vjdb:
+      - biopython:
           type: string
           description: The name of the tool
-      - vjdb --version:
+      - python -c "import Bio; print(Bio.__version__)":
           type: eval
           description: The expression to obtain the version of the tool
 authors:
