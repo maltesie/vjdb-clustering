@@ -57,3 +57,11 @@ echo "Done. Outputs:"
 echo "  Updated full CSV:    ${OUTPUT_PREFIX}_merged_reps.csv"
 echo "  New sequences CSV:   ${OUTPUT_PREFIX}_new_clusters.csv"
 echo "  Updated rep FASTA:   ${OUTPUT_PREFIX}_merged_reps.fna.gz"
+
+# --- Step 4: Validate consistency ---
+echo ""
+echo "=== Validating clustering consistency ==="
+python3 bin/validate_update.py \
+    --before "$EXISTING_CSV" \
+    --after "${OUTPUT_PREFIX}_merged_reps.csv" \
+    --new "${OUTPUT_PREFIX}_new_clusters.csv"

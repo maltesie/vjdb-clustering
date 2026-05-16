@@ -52,4 +52,9 @@ python3 bin/6_finalize_update.py \
     --existing-csv vjdb1_merged_reps.csv \
     --output-prefix vjdb1_test
 
-echo "Done. Check vjdb1_test_new_clusters.csv for test sequence assignments."
+echo ""
+echo "=== Validating clustering consistency ==="
+python3 bin/validate_update.py \
+    --before vjdb1_merged_reps.csv \
+    --after vjdb1_test_merged_reps.csv \
+    --new vjdb1_test_new_clusters.csv
