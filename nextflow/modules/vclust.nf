@@ -5,6 +5,9 @@ process VCLUST_CLUSTER {
      *
      * All three steps use consistent ANI/qcov thresholds passed as parameters.
      * Output is renamed with a prefix to avoid collisions when collected.
+     *
+     * If vclust align produces no pairs, falls back to treating each sequence
+     * as its own cluster (vclust cluster crashes on empty ANI input).
      */
 
     tag "${rep_fasta.simpleName}"
@@ -38,17 +41,25 @@ process VCLUST_CLUSTER {
         --out-ani ${ani} \
         --out-qcov ${qcov}
 
-    ${params.vclust} cluster \
-        -i ani.tsv \
-        -o clusterreps_leiden.tsv \
-        --ids ani.ids.tsv \
-        --algorithm leiden \
-        --metric ani \
-        --ani ${ani} \
-        --qcov ${qcov} \
-        --out-repr
+    ANI_LINES=\$(wc -l < ani.tsv)
+    if [ "\${ANI_LINES}" -le 1 ]; then
+        echo "No ANI pairs above threshold — each sequence is its own cluster"
+        echo -e "object\\tcluster" > ${prefix}_leiden.tsv
+        zgrep '^>' ${rep_fasta} | sed 's/^>//' | cut -d' ' -f1 | \
+            awk '{print \$1 "\\t" \$1}' >> ${prefix}_leiden.tsv
+    else
+        ${params.vclust} cluster \
+            -i ani.tsv \
+            -o clusterreps_leiden.tsv \
+            --ids ani.ids.tsv \
+            --algorithm leiden \
+            --metric ani \
+            --ani ${ani} \
+            --qcov ${qcov} \
+            --out-repr
+        mv clusterreps_leiden.tsv ${prefix}_leiden.tsv
+    fi
 
-    mv clusterreps_leiden.tsv ${prefix}_leiden.tsv
     rm -f fltr.txt ani.tsv ani.ids.tsv
     """
 }
