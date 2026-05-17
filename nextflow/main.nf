@@ -17,6 +17,7 @@ params.existing_reps  = null   // Phase 2: existing representative FASTA.gz
 params.existing_csv   = null   // Phase 2: existing merged CSV
 params.threads        = 24
 params.outdir         = 'results'
+params.prefix_update = params.prefix_update ?: 'vjdb1_new'
 
 // Clustering thresholds (single source of truth)
 params.ani            = 0.95
@@ -92,6 +93,7 @@ workflow UPDATE_CLUSTERING {
 
         // Step 3: remap and finalize
         finalized = FINALIZE_UPDATE(
+            prepared.update_tmp_dir,
             vclust_out.leiden_tsv,
             prepared.hashed_csv,
             existing_csv,
