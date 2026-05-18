@@ -18,18 +18,24 @@ params.existing_csv   = null   // Phase 2: existing merged CSV
 params.threads        = 24
 params.outdir         = 'results'
 
+// Clustering thresholds (single source of truth)
+params.ani            = 0.95
+params.qcov           = 0.85
+
 // Tool paths — override in nextflow.config or on the command line
 params.mmseqs         = 'mmseqs'
 params.vclust         = 'vclust.py'
 
 include { HASH_DEDUP }                   from './modules/hash_dedup'
 include { LINCLUST }                     from './modules/linclust'
-include { VCLUST_CLUSTER }               from './modules/vclust'
+include { VCLUST_CLUSTER }                              from './modules/vclust'
+include { VCLUST_CLUSTER as VCLUST_CLUSTER_MERGED }      from './modules/vclust'
+include { VCLUST_CLUSTER as VCLUST_CLUSTER_UPDATE }      from './modules/vclust'
 include { EXTRACT_MERGE_CHUNK_REPS }     from './modules/merge'
 include { MERGE_FINAL_CLUSTERS }         from './modules/merge'
 include { EXTRACT_REPS_OF_REPS }         from './modules/merge'
-include { PREPARE_UPDATE }               from './modules/merge'
-include { FINALIZE_UPDATE }              from './modules/merge'
+include { PREPARE_UPDATE }               from './modules/update'
+include { FINALIZE_UPDATE }              from './modules/update'
 
 workflow INITIAL_CLUSTERING {
     take:
@@ -43,7 +49,7 @@ workflow INITIAL_CLUSTERING {
         linclust_out = LINCLUST(chunks.fasta_chunks.flatten())
 
         // Step 3: vclust per chunk
-        vclust_chunk_out = VCLUST_CLUSTER(linclust_out.rep_fasta)
+        vclust_chunk_out = VCLUST_CLUSTER(linclust_out.rep_fasta, params.ani, params.qcov)
 
         // Step 4: merge chunk-level reps
         merged_reps_fasta = EXTRACT_MERGE_CHUNK_REPS(
@@ -52,7 +58,7 @@ workflow INITIAL_CLUSTERING {
         )
 
         // Step 5: vclust on merged reps
-        vclust_merged_out = VCLUST_CLUSTER(merged_reps_fasta)
+        vclust_merged_out = VCLUST_CLUSTER_MERGED(merged_reps_fasta, params.ani, params.qcov)
 
         // Step 6: final merge
         final_csv = MERGE_FINAL_CLUSTERS(
@@ -82,7 +88,7 @@ workflow UPDATE_CLUSTERING {
         prepared = PREPARE_UPDATE(new_seqs, existing_reps)
 
         // Step 2: vclust on combined set
-        vclust_out = VCLUST_CLUSTER(prepared.combined_fasta)
+        vclust_out = VCLUST_CLUSTER_UPDATE(prepared.combined_fasta, params.ani, params.qcov)
 
         // Step 3: remap and finalize
         finalized = FINALIZE_UPDATE(
