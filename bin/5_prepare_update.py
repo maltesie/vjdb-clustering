@@ -1,17 +1,17 @@
+#!/usr/bin/env python3
+
 import argparse
+import gzip
 import hashlib
+import os
+import pandas as pd
 from Bio import SeqIO
 from Bio.SeqUtils import gc_fraction
-import os, gzip
-import pandas as pd
 
 parser = argparse.ArgumentParser(description="Prepare new sequences for clustering with existing representatives.")
 parser.add_argument("--new-seqs", required=True, help="Path to new sequences FASTA.gz")
 parser.add_argument("--existing-reps", required=True, help="Path to existing merged rep FASTA.gz (e.g. vjdb1_merged_reps.fna.gz)")
-parser.add_argument("--outdir", required=True, help="Output directory for intermediate files")
 args = parser.parse_args()
-
-os.makedirs(args.outdir, exist_ok=True)
 
 hash_to_id = dict()
 seq_ids = []
@@ -19,8 +19,8 @@ rep_ids = []
 lens = []
 gcs = []
 
-combined_file = os.path.join(args.outdir, "combined_for_vclust.fna.gz")
-new_hashed_file = os.path.join(args.outdir, "new_hashed_reps.csv")
+combined_file = os.path.join("combined_for_vclust.fna.gz")
+new_hashed_file = os.path.join("new_hashed_reps.csv")
 
 existing_count = 0
 with gzip.open(combined_file, "wt", 2) as out_handle:
