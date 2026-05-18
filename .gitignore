@@ -14,3 +14,5 @@ __pycache__/
 # Test dataset (committed)
 !vjdb1_merged_reps.fna.gz
 !vjdb1_merged_reps.csv
+.nf-test/
+.nf-test.log

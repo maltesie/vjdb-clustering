@@ -1,43 +1,47 @@
-# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
 name: "virjendb_prepareupdate"
-description: write your description here
+description: Update the clusters for virjendb using new FASTA files and existing reps
 keywords:
   - virjendb
   - virus
   - genomics
 tools:
   - "virjendb":
-      description: "An integrative virus sequence database that connects researchers with publicly available virus sequence data and its metadata."
+      description:
+        "An integrative virus sequence database that connects researchers
+        with publicly available virus sequence data and its metadata."
       homepage: "https://virjendb.org/"
       documentation: "https://github.com/maltesie/vjdb-clustering/README.md"
       tool_dev_url: "https://github.com/maltesie/vjdb-clustering"
       doi: "no DOI available"
-      licence: ["Biopython License Agreement"] ## TODO @maltesie, please comment
+      licence:
+        - "Biopython License Agreement"
       identifier: ""
-
 input:
   - fna_gz:
       type: file
       description: GZipped FASTA nucleic acid file, containing new viral sequences
       pattern: "*.{fna.gz}"
       ontologies:
-        - edam: http://edamontology.org/format_1929 # FASTA
+        - edam: http://edamontology.org/format_1929
   - reps_fna_gz:
       type: file
-      description: GZipped FASTA nucleic acid file, containing representative viral sequences from initial clustering
+      description: GZipped FASTA nucleic acid file, containing representative
+        viral sequences from initial clustering
       pattern: "*.{fna.gz}"
       ontologies:
-        - edam: http://edamontology.org/format_1929 # FASTA
+        - edam: http://edamontology.org/format_1929
 output:
   combined_reps_fna:
     - "*.fna.gz":
         type: file
-        description: GZipped FASTA nucleic acid file, containing existing reps and the deduplicated (via hash) new reps
+        description:
+          GZipped FASTA nucleic acid file, containing existing reps and
+          the deduplicated (via hash) new reps
         pattern: "*.{fna.gz}"
         ontologies:
-        - edam: http://edamontology.org/format_1929 # FASTA 
+          - edam: http://edamontology.org/format_1929
   hashed_reps:
-    - "*.CSV":
+    - "*.csv":
         type: file
         description: CSV file containing the sequence ID, representative ID, GC content and length
         pattern: "*.{csv}"
