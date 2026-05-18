@@ -1,0 +1,46 @@
+{
+    "vjndb update test - fna": {
+        "content": [
+            {
+                "combined_reps_fna": [
+                    
+                ],
+                "hashed_reps": [
+                    
+                ],
+                "versions_biopython": [
+                    
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.6"
+        },
+        "timestamp": "2026-05-18T14:50:44.603697849"
+    },
+    "vjndb update test - fna - stub": {
+        "content": [
+            {
+                "combined_reps_fna": [
+                    "/home/uridavid/Code/vjdb-clustering/.nf-test/tests/22b1fce9107d1a6cd3cc30f81525d4b/work/eb/2533a63e4d5399b06d77aa5762f809/combined_for_vclust.fna.gz"
+                ],
+                "hashed_reps": [
+                    "new_hashed_reps.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions_biopython": [
+                    [
+                        "VIRJENDB_PREPAREUPDATE",
+                        "biopython",
+                        "1.81"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.6"
+        },
+        "timestamp": "2026-05-18T14:50:52.175783279"
+    }
+}
