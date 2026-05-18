@@ -2,37 +2,30 @@
     "vjndb update test - fna": {
         "content": [
             {
+                "0": [
+                    "combined_for_vclust.fna.gz:md5,f166074cd9a9b7341376d5a0fff5ceee"
+                ],
+                "1": [
+                    "new_hashed_reps.csv:md5,662f4ab26a0711a5d709b478c6b8cb15"
+                ],
+                "2": [
+                    [
+                        "VIRJENDB_PREPAREUPDATE",
+                        "biopython",
+                        "1.87"
+                    ]
+                ],
                 "combined_reps_fna": [
-                    
+                    "combined_for_vclust.fna.gz:md5,f166074cd9a9b7341376d5a0fff5ceee"
                 ],
                 "hashed_reps": [
-                    
-                ],
-                "versions_biopython": [
-                    
-                ]
-            }
-        ],
-        "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "25.04.6"
-        },
-        "timestamp": "2026-05-18T14:50:44.603697849"
-    },
-    "vjndb update test - fna - stub": {
-        "content": [
-            {
-                "combined_reps_fna": [
-                    "/home/uridavid/Code/vjdb-clustering/.nf-test/tests/22b1fce9107d1a6cd3cc30f81525d4b/work/eb/2533a63e4d5399b06d77aa5762f809/combined_for_vclust.fna.gz"
-                ],
-                "hashed_reps": [
-                    "new_hashed_reps.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    "new_hashed_reps.csv:md5,662f4ab26a0711a5d709b478c6b8cb15"
                 ],
                 "versions_biopython": [
                     [
                         "VIRJENDB_PREPAREUPDATE",
                         "biopython",
-                        "1.81"
+                        "1.87"
                     ]
                 ]
             }
@@ -41,6 +34,43 @@
             "nf-test": "0.9.2",
             "nextflow": "25.04.6"
         },
-        "timestamp": "2026-05-18T14:50:52.175783279"
+        "timestamp": "2026-05-18T22:09:42.764268509"
+    },
+    "vjndb update test - fna - stub": {
+        "content": [
+            {
+                "0": [
+                    "combined_for_vclust.fna.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                ],
+                "1": [
+                    "new_hashed_reps.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "2": [
+                    [
+                        "VIRJENDB_PREPAREUPDATE",
+                        "biopython",
+                        "1.87"
+                    ]
+                ],
+                "combined_reps_fna": [
+                    "combined_for_vclust.fna.gz:md5,68b329da9893e34099c7d8ad5cb9c940"
+                ],
+                "hashed_reps": [
+                    "new_hashed_reps.csv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "versions_biopython": [
+                    [
+                        "VIRJENDB_PREPAREUPDATE",
+                        "biopython",
+                        "1.87"
+                    ]
+                ]
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "25.04.6"
+        },
+        "timestamp": "2026-05-18T22:09:50.036523679"
     }
 }

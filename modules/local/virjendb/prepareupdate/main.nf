@@ -12,7 +12,7 @@ process VIRJENDB_PREPAREUPDATE {
     path reps_fna_gz
 
     output:
-    path "*.fna.gz", emit: combined_reps_fna
+    path "combined_for_vclust.fna.gz", emit: combined_reps_fna
     path "*.csv", emit: hashed_reps
     tuple val("${task.process}"), val('biopython'), eval('python -c "import Bio; print(Bio.__version__)"'), emit: versions_biopython, topic: versions
 
@@ -28,7 +28,7 @@ process VIRJENDB_PREPAREUPDATE {
 
     stub:
     """
-    touch combined_for_vclust.fna.gz
+    echo | gzip > combined_for_vclust.fna.gz
     touch new_hashed_reps.csv
     """
 }
