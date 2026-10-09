@@ -55,23 +55,3 @@ process FINALIZE_UPDATE {
         --output-prefix ${params.prefix_update}
     """
 }
-
-process CHECK_TEST_UPDATE {
-    /*
-     * Compare an update run on the bundled test data with the expected result.
-     * Only used by -profile test. Wraps: bin/check_test_update.py
-     */
-
-    debug true
-
-    input:
-    path merged_csv
-    path new_clusters
-    path events
-    path existing_csv
-
-    script:
-    """
-    check_test_update.py ${params.prefix_update} ${existing_csv}
-    """
-}

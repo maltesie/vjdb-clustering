@@ -27,6 +27,8 @@ nextflow run main.nf -profile test
 
 The run ends with `OK: all checks passed` and writes its outputs to `results_test/`.
 
+To test the initial clustering as well, use `-profile test_initial`. It clusters the synthetic test dataset in three chunks, checks that the expected clusters come out, and writes to `results_test_initial/`.
+
 ---
 
 ## Phase 1 — Initial clustering
@@ -142,7 +144,7 @@ All defaults are set in `nextflow.config`.
 
 ## Running on your system
 
-- **Profiles:** `-profile test` (bundled test data), `no_conda` (tools from your `PATH`), `slurm` (example for a cluster; adjust the queue in `nextflow.config`). Profiles can be combined, e.g. `-profile test,no_conda`.
+- **Profiles:** `test` and `test_initial` (bundled test data, see [Test data](#test-data)), `no_conda` (tools from your `PATH`), `slurm` (example for a cluster; adjust the queue in `nextflow.config`). Profiles can be combined, e.g. `-profile test,no_conda`.
 - **Resources:** each process asks for 16 GB of memory and `--threads` CPUs by default; the Python steps use one CPU. The `slurm` profile asks for 100 GB for MMseqs2 linclust and 200 GB for each vclust run, since vclust on ~1M sequences can use that much. Nextflow refuses to start a process that asks for more than your machine has, so on a small machine lower them in your own config and pass it with `-c my.config`:
   ```groovy
   process.memory = '4 GB'
@@ -155,7 +157,7 @@ All defaults are set in `nextflow.config`.
 
 `test_data/` holds a small clustering (100 clusters, 667 sequences) and inputs for an update that covers every case: new sequences, copies, a resubmission, cluster growth and a merge caused by a chimera, plus a file with a clashing ID that the update must reject.
 
-- `vjdb1_test_full_dataset.fna.gz` is a synthetic full dataset matching the test CSV (members are ~1% mutated copies of their representative), built by `bin/make_synthetic_full_dataset.py`. It can also be used as `--input` for Phase 1.
+- `vjdb1_test_full_dataset.fna.gz` is a synthetic full dataset matching the test CSV (members are ~1% mutated copies of their representative), built by `bin/make_synthetic_full_dataset.py`. `-profile test_initial` clusters it and `bin/check_test_initial.py` checks that the result has the same clusters as the test CSV. Representative IDs may differ, because Leiden can pick another member as representative.
 - `vjdb1_test_new_sequences.fna.gz` and `vjdb1_test_clash.fna.gz` are built by `bin/make_test_data.py`; `bin/check_test_update.py` checks the outputs.
 
 ## Repository structure

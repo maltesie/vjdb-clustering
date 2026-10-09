@@ -6,7 +6,8 @@ nextflow.enable.dsl=2
  *
  *   nextflow run main.nf --mode initial --input <fasta.gz>
  *   nextflow run main.nf --mode update  --new_seqs <fasta.gz> --existing_reps <fasta.gz> --existing_csv <csv>
- *   nextflow run main.nf -profile test
+ *   nextflow run main.nf -profile test           (update on test data, with checks)
+ *   nextflow run main.nf -profile test_initial   (initial clustering on test data, with checks)
  *
  * All parameter defaults are defined in nextflow.config.
  */
@@ -21,7 +22,8 @@ include { MERGE_FINAL_CLUSTERS }         from './modules/merge'
 include { EXTRACT_REPS_OF_REPS }         from './modules/merge'
 include { PREPARE_UPDATE }               from './modules/update'
 include { FINALIZE_UPDATE }              from './modules/update'
-include { CHECK_TEST_UPDATE }            from './modules/update'
+include { CHECK_TEST_INITIAL }           from './modules/test'
+include { CHECK_TEST_UPDATE }            from './modules/test'
 
 workflow INITIAL_CLUSTERING {
     take:
@@ -95,6 +97,13 @@ workflow {
     if (params.mode == 'initial') {
         if (!params.input) error "--mode initial needs --input"
         INITIAL_CLUSTERING(Channel.fromPath(params.input, checkIfExists: true))
+        if (params.check_test) {
+            CHECK_TEST_INITIAL(
+                INITIAL_CLUSTERING.out.csv,
+                INITIAL_CLUSTERING.out.fasta,
+                Channel.fromPath("${projectDir}/test_data/vjdb1_merged_reps.csv", checkIfExists: true)
+            )
+        }
     } else if (params.mode == 'update') {
         def missing = ['new_seqs', 'existing_reps', 'existing_csv'].findAll { !params[it] }
         if (missing) error "--mode update needs " + missing.collect { "--${it}" }.join(', ')
@@ -113,6 +122,6 @@ workflow {
             )
         }
     } else {
-        error "Set --mode to 'initial' or 'update', or use -profile test"
+        error "Set --mode to 'initial' or 'update', or use -profile test / test_initial"
     }
 }
