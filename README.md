@@ -122,7 +122,7 @@ All defaults are set in `nextflow.config`.
 ## Running on your system
 
 - **Profiles:** `-profile test` (bundled test data), `no_conda` (tools from your `PATH`), `slurm` (example for a cluster; adjust the queue in `nextflow.config`). Profiles can be combined, e.g. `-profile test,no_conda`.
-- **Resources:** each process asks for 16 GB of memory and `--threads` CPUs by default. Nextflow refuses to start a process that asks for more than your machine has, so on a small machine lower them in your own config and pass it with `-c my.config`:
+- **Resources:** each process asks for 16 GB of memory and `--threads` CPUs by default; the Python steps use one CPU. The `slurm` profile asks for 100 GB for MMseqs2 linclust and 200 GB for each vclust run, since vclust on ~1M sequences can use that much. Nextflow refuses to start a process that asks for more than your machine has, so on a small machine lower them in your own config and pass it with `-c my.config`:
   ```groovy
   process.memory = '4 GB'
   ```
