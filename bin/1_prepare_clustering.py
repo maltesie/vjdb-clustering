@@ -22,6 +22,7 @@ seq_ids = []
 rep_ids = []
 lens = []
 gcs = []
+hashes = []
 out_handle = None
 
 with gzip.open(args.input, "rt") as handle:
@@ -38,6 +39,7 @@ with gzip.open(args.input, "rt") as handle:
         record.id = record.id.split(',')[0]
 
         seq_ids.append(record.id)
+        hashes.append(seq_hash)
         lens.append(len(record))
         gcs.append(gc_fraction(str(record.seq)))
 
@@ -50,7 +52,9 @@ with gzip.open(args.input, "rt") as handle:
     if out_handle is not None:
         out_handle.close()
 
-print(Counter(seq_ids).most_common(10))
+dup_ids = [(sid, n) for sid, n in Counter(seq_ids).most_common() if n > 1]
+if dup_ids:
+    raise SystemExit(f"Error: {len(dup_ids)} sequence IDs occur more than once, e.g. {dup_ids[:10]}")
 print(f"{len(hash_to_id)} unique sequences out of {i + 1} sequences")
-out_df = pd.DataFrame({"vjdb_id": seq_ids, "copy_of": rep_ids, "seq_gc": gcs, "seq_len": lens})
+out_df = pd.DataFrame({"vjdb_id": seq_ids, "copy_of": rep_ids, "seq_gc": gcs, "seq_len": lens, "seq_hash": hashes})
 out_df.to_csv(os.path.join(args.outdir, "vjdb1_hashed_reps.csv"), index=False)

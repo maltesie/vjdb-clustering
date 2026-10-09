@@ -17,7 +17,7 @@ params.existing_reps  = null   // Phase 2: existing representative FASTA.gz
 params.existing_csv   = null   // Phase 2: existing merged CSV
 params.threads        = 24
 params.outdir         = 'results'
-params.prefix_update = params.prefix_update ?: 'vjdb1_new'
+params.prefix_update  = 'vjdb1_new' // Phase 2: prefix for output files
 
 // Clustering thresholds (single source of truth)
 params.ani            = 0.95
@@ -85,15 +85,14 @@ workflow UPDATE_CLUSTERING {
         existing_csv
 
     main:
-        // Step 1: hash-dedup new, combine with existing reps
-        prepared = PREPARE_UPDATE(new_seqs, existing_reps)
+        // Step 1: hash new seqs against the full dataset, check IDs, combine with existing reps
+        prepared = PREPARE_UPDATE(new_seqs, existing_reps, existing_csv)
 
         // Step 2: vclust on combined set
         vclust_out = VCLUST_CLUSTER_UPDATE(prepared.combined_fasta, params.ani, params.qcov)
 
-        // Step 3: remap and finalize
+        // Step 3: remap with stable IDs, report cluster events
         finalized = FINALIZE_UPDATE(
-            prepared.update_tmp_dir,
             vclust_out.leiden_tsv,
             prepared.hashed_csv,
             existing_csv,
@@ -101,8 +100,10 @@ workflow UPDATE_CLUSTERING {
         )
 
     emit:
-        csv   = finalized.merged_csv
-        fasta = finalized.rep_fasta
+        csv          = finalized.merged_csv
+        fasta        = finalized.rep_fasta
+        new_clusters = finalized.new_clusters
+        events       = finalized.events
 }
 
 workflow {

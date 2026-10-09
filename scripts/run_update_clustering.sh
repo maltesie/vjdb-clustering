@@ -29,6 +29,7 @@ source py3env/bin/activate
 python3 bin/5_prepare_update.py \
     --new-seqs "$NEW_SEQS" \
     --existing-reps "$EXISTING_REPS" \
+    --existing-csv "$EXISTING_CSV" \
     --outdir "$TMPDIR"
 
 # --- Step 2: Run vclust on the combined set ---
@@ -49,11 +50,14 @@ rm -f "$TMPDIR/ani.tsv" "$TMPDIR/fltr.txt" "$TMPDIR/ani.ids.tsv"
 
 # --- Step 3: Remap clusters, update CSVs, extract new reps ---
 python3 bin/6_finalize_update.py \
-    --outdir "$TMPDIR" \
+    --leiden-tsv "$TMPDIR/clusterreps_leiden.tsv" \
+    --new-hashed-csv "$TMPDIR/new_hashed_reps.csv" \
+    --combined-fasta "$COMBINED" \
     --existing-csv "$EXISTING_CSV" \
     --output-prefix "$OUTPUT_PREFIX"
 
 echo "Done. Outputs:"
 echo "  Updated full CSV:    ${OUTPUT_PREFIX}_merged_reps.csv"
 echo "  New sequences CSV:   ${OUTPUT_PREFIX}_new_clusters.csv"
+echo "  Cluster events:      ${OUTPUT_PREFIX}_cluster_events.tsv"
 echo "  Updated rep FASTA:   ${OUTPUT_PREFIX}_merged_reps.fna.gz"

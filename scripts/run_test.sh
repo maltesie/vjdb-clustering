@@ -3,7 +3,8 @@ set -euo pipefail
 
 # Usage: bash scripts/run_test.sh
 # Requires: VCLUST and (optionally) THREADS as environment variables.
-# Expects vjdb1_merged_reps.fna.gz and vjdb1_merged_reps.csv in the repo root.
+# Expects vjdb1_merged_reps.fna.gz, vjdb1_merged_reps.csv and
+# vjdb1_test_full_dataset.fna.gz in the repo root.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$(dirname "$SCRIPT_DIR")"  # repo root
@@ -24,10 +25,23 @@ python3 bin/make_test_data.py
 
 echo "Test data generated. Running update pipeline..."
 
+# --- Clashing IDs must be rejected ---
+if python3 bin/5_prepare_update.py \
+    --new-seqs vjdb1_test_clash.fna.gz \
+    --existing-reps vjdb1_merged_reps.fna.gz \
+    --existing-csv vjdb1_merged_reps.csv \
+    --outdir "${TMPDIR}_clash" 2>/dev/null; then
+    echo "FAIL: clashing ID was not rejected" >&2
+    exit 1
+fi
+rm -rf "${TMPDIR}_clash"
+echo "OK: clashing ID rejected"
+
 # --- Step 1: Prepare combined FASTA ---
 python3 bin/5_prepare_update.py \
     --new-seqs vjdb1_test_new_sequences.fna.gz \
     --existing-reps vjdb1_merged_reps.fna.gz \
+    --existing-csv vjdb1_merged_reps.csv \
     --outdir "$TMPDIR"
 
 # --- Step 2: Run vclust on combined set ---
@@ -48,8 +62,13 @@ rm -f "$TMPDIR/ani.tsv" "$TMPDIR/fltr.txt" "$TMPDIR/ani.ids.tsv"
 
 # --- Step 3: Finalize ---
 python3 bin/6_finalize_update.py \
-    --outdir "$TMPDIR" \
+    --leiden-tsv "$TMPDIR/clusterreps_leiden.tsv" \
+    --new-hashed-csv "$TMPDIR/new_hashed_reps.csv" \
+    --combined-fasta "$COMBINED" \
     --existing-csv vjdb1_merged_reps.csv \
     --output-prefix vjdb1_test
 
-echo "Done. Check vjdb1_test_new_clusters.csv for test sequence assignments."
+# --- Check the expected outcome ---
+python3 bin/check_test_update.py vjdb1_test
+
+echo "Done. See vjdb1_test_new_clusters.csv and vjdb1_test_cluster_events.tsv."
