@@ -126,6 +126,7 @@ All defaults are set in `nextflow.config`.
   ```groovy
   process.memory = '4 GB'
   ```
+- **Adjusting memory:** the requirements are set in [`nextflow.config`](nextflow.config): the default for all processes in the `process` block, and the MMseqs2 and vclust values in the `slurm` profile. Edit them there, or override a single step in your own config, e.g. `process { withName: 'VCLUST_CLUSTER.*' { memory = '300 GB' } }`.
 - **Resuming:** add `-resume` to continue an interrupted run; finished steps are taken from the `work/` directory.
 - **Files:** results are copied to `--outdir`. Intermediate files stay in `work/`, which you can delete after a successful run.
 
