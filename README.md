@@ -32,8 +32,17 @@ The run ends with `OK: all checks passed` and writes its outputs to `results_tes
 
 Clusters the full dataset from scratch. Run it once to produce the baseline cluster representatives and membership table.
 
+Straight from GitHub:
+
 ```bash
 nextflow run maltesie/vjdb-clustering --mode initial --input vjdb.fasta.gz --outdir results
+```
+
+From a local clone, e.g. after adjusting the memory requirements in `nextflow.config` for a large dataset (see [Adjusting memory](#running-on-your-system)):
+
+```bash
+git clone https://github.com/maltesie/vjdb-clustering.git
+nextflow run vjdb-clustering/main.nf --mode initial --input vjdb.fasta.gz --outdir results
 ```
 
 ```
@@ -63,8 +72,20 @@ These two files are the input for Phase 2.
 
 Adds new sequences to an existing clustering without starting from scratch. Only the existing representatives and the genuinely new sequences are re-clustered.
 
+Straight from GitHub:
+
 ```bash
 nextflow run maltesie/vjdb-clustering --mode update \
+    --new_seqs new_sequences.fasta.gz \
+    --existing_reps results/vjdb1_merged_reps.fna.gz \
+    --existing_csv results/vjdb1_merged_reps.csv \
+    --prefix_update vjdb2 --outdir results_update
+```
+
+From a local clone (cloned as in Phase 1):
+
+```bash
+nextflow run vjdb-clustering/main.nf --mode update \
     --new_seqs new_sequences.fasta.gz \
     --existing_reps results/vjdb1_merged_reps.fna.gz \
     --existing_csv results/vjdb1_merged_reps.csv \
