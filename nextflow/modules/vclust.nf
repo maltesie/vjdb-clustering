@@ -4,6 +4,7 @@ process VCLUST_CLUSTER {
      * Used both per-chunk and on the merged representatives.
      *
      * All three steps use consistent ANI/qcov thresholds passed as parameters.
+     * Output is renamed with a prefix to avoid collisions when collected.
      */
 
     tag "${rep_fasta.simpleName}"
@@ -14,9 +15,10 @@ process VCLUST_CLUSTER {
     val  qcov
 
     output:
-    path "clusterreps_leiden.tsv", emit: leiden_tsv
+    path "${rep_fasta.simpleName}_leiden.tsv", emit: leiden_tsv
 
     script:
+    def prefix = rep_fasta.simpleName
     """
     ${params.vclust} prefilter \
         -i ${rep_fasta} \
@@ -46,6 +48,7 @@ process VCLUST_CLUSTER {
         --qcov ${qcov} \
         --out-repr
 
+    mv clusterreps_leiden.tsv ${prefix}_leiden.tsv
     rm -f fltr.txt ani.tsv ani.ids.tsv
     """
 }

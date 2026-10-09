@@ -2,11 +2,6 @@ process HASH_DEDUP {
     /*
      * Hash-deduplicate input sequences and split into chunks.
      * Wraps: bin/1_prepare_clustering.py
-     *
-     * TODO: Implement this process.
-     *   - Input:  a single FASTA.gz
-     *   - Output: chunked FASTA.gz files + hashed_reps CSV
-     *   - The script accepts --input, --outdir, --block-size
      */
 
     input:
@@ -19,6 +14,6 @@ process HASH_DEDUP {
 
     script:
     """
-    # TODO
+    1_prepare_clustering.py --input ${fasta} --outdir chunks --block-size ${block_size}
     """
 }

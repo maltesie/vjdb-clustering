@@ -4,6 +4,7 @@ update_tmp/
 lintmp/
 results/
 work/
+.vscode/
 .nextflow/
 .nextflow.log*
 *.fna.gz

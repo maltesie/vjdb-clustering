@@ -1,0 +1,9 @@
+name: vjdb-clustering
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - vclust=1.3.1
+  - mmseqs2
+  - biopython
+  - pandas
