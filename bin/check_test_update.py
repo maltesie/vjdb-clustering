@@ -9,7 +9,7 @@ import sys
 import pandas as pd
 
 prefix = sys.argv[1]
-existing_csv = sys.argv[2] if len(sys.argv) > 2 else "vjdb1_merged_reps.csv"
+existing_csv = sys.argv[2] if len(sys.argv) > 2 else "test_data/vjdb1_merged_reps.csv"
 
 existing = pd.read_csv(existing_csv, dtype=str)
 merged = pd.read_csv(f"{prefix}_merged_reps.csv", dtype=str)

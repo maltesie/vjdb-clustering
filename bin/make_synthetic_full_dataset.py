@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Build a synthetic "full" dataset for testing, consistent with the committed
-test outputs of Phase 1 (vjdb1_merged_reps.csv / vjdb1_merged_reps.fna.gz).
+test outputs of Phase 1 in test_data/ (vjdb1_merged_reps.csv / vjdb1_merged_reps.fna.gz).
 
 Only the cluster representatives have real sequences in the repo. For every
 other member listed in the CSV this script creates a sequence:
@@ -22,9 +22,9 @@ from Bio import SeqIO
 
 random.seed(1)
 
-reps_file = "vjdb1_merged_reps.fna.gz"
-csv_file = "vjdb1_merged_reps.csv"
-out_fasta = "vjdb1_test_full_dataset.fna.gz"
+reps_file = "test_data/vjdb1_merged_reps.fna.gz"
+csv_file = "test_data/vjdb1_merged_reps.csv"
+out_fasta = "test_data/vjdb1_test_full_dataset.fna.gz"
 MUTATION_RATE = 0.01
 
 with gzip.open(reps_file, "rt") as handle:

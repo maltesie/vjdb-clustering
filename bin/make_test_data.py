@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate test inputs for the update step (run from the repo root).
+Generate test inputs for the update step (run from the repo root, writes to test_data/).
 
 vjdb1_test_new_sequences.fna.gz covers every case 5_prepare_update.py and
 6_finalize_update.py handle:
@@ -27,11 +27,11 @@ from Bio.SeqRecord import SeqRecord
 
 random.seed(42)
 
-reps_file = "vjdb1_merged_reps.fna.gz"
-full_file = "vjdb1_test_full_dataset.fna.gz"
-csv_file = "vjdb1_merged_reps.csv"
-out_file = "vjdb1_test_new_sequences.fna.gz"
-clash_file = "vjdb1_test_clash.fna.gz"
+reps_file = "test_data/vjdb1_merged_reps.fna.gz"
+full_file = "test_data/vjdb1_test_full_dataset.fna.gz"
+csv_file = "test_data/vjdb1_merged_reps.csv"
+out_file = "test_data/vjdb1_test_new_sequences.fna.gz"
+clash_file = "test_data/vjdb1_test_clash.fna.gz"
 
 
 def rec(seq, seq_id):

@@ -18,7 +18,7 @@ process LINCLUST {
     def prefix = chunk_fasta.simpleName
     """
     mkdir -p tmpdir
-    ${params.mmseqs} easy-linclust --threads ${task.cpus} --min-seq-id 0.95 \
+    ${params.mmseqs} easy-linclust --threads ${task.cpus} --min-seq-id ${params.linclust_id} \
         ${chunk_fasta} ${prefix}_linclust tmpdir
     gzip -2 ${prefix}_linclust_rep_seq.fasta
     rm -rf tmpdir ${prefix}_linclust_all_seqs.fasta

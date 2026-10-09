@@ -4,28 +4,12 @@ nextflow.enable.dsl=2
 /*
  * VJDB Sequence Clustering Pipeline
  *
- * Two entry points:
  *   nextflow run main.nf --mode initial --input <fasta.gz>
  *   nextflow run main.nf --mode update  --new_seqs <fasta.gz> --existing_reps <fasta.gz> --existing_csv <csv>
+ *   nextflow run main.nf -profile test
+ *
+ * All parameter defaults are defined in nextflow.config.
  */
-
-params.mode           = null   // 'initial' or 'update'
-params.input          = null   // Phase 1: input FASTA.gz
-params.block_size     = 1000000
-params.new_seqs       = null   // Phase 2: new sequences FASTA.gz
-params.existing_reps  = null   // Phase 2: existing representative FASTA.gz
-params.existing_csv   = null   // Phase 2: existing merged CSV
-params.threads        = 24
-params.outdir         = 'results'
-params.prefix_update  = 'vjdb1_new' // Phase 2: prefix for output files
-
-// Clustering thresholds (single source of truth)
-params.ani            = 0.95
-params.qcov           = 0.85
-
-// Tool paths — override in nextflow.config or on the command line
-params.mmseqs         = 'mmseqs'
-params.vclust         = 'vclust.py'
 
 include { HASH_DEDUP }                   from './modules/hash_dedup'
 include { LINCLUST }                     from './modules/linclust'
@@ -37,6 +21,7 @@ include { MERGE_FINAL_CLUSTERS }         from './modules/merge'
 include { EXTRACT_REPS_OF_REPS }         from './modules/merge'
 include { PREPARE_UPDATE }               from './modules/update'
 include { FINALIZE_UPDATE }              from './modules/update'
+include { CHECK_TEST_UPDATE }            from './modules/update'
 
 workflow INITIAL_CLUSTERING {
     take:
@@ -108,14 +93,26 @@ workflow UPDATE_CLUSTERING {
 
 workflow {
     if (params.mode == 'initial') {
-        INITIAL_CLUSTERING(Channel.fromPath(params.input))
+        if (!params.input) error "--mode initial needs --input"
+        INITIAL_CLUSTERING(Channel.fromPath(params.input, checkIfExists: true))
     } else if (params.mode == 'update') {
+        def missing = ['new_seqs', 'existing_reps', 'existing_csv'].findAll { !params[it] }
+        if (missing) error "--mode update needs " + missing.collect { "--${it}" }.join(', ')
+        def existing_csv = Channel.fromPath(params.existing_csv, checkIfExists: true)
         UPDATE_CLUSTERING(
-            Channel.fromPath(params.new_seqs),
-            Channel.fromPath(params.existing_reps),
-            Channel.fromPath(params.existing_csv)
+            Channel.fromPath(params.new_seqs, checkIfExists: true),
+            Channel.fromPath(params.existing_reps, checkIfExists: true),
+            existing_csv
         )
+        if (params.check_test) {
+            CHECK_TEST_UPDATE(
+                UPDATE_CLUSTERING.out.csv,
+                UPDATE_CLUSTERING.out.new_clusters,
+                UPDATE_CLUSTERING.out.events,
+                existing_csv
+            )
+        }
     } else {
-        error "Set --mode to 'initial' or 'update'"
+        error "Set --mode to 'initial' or 'update', or use -profile test"
     }
 }

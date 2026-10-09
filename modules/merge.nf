@@ -26,7 +26,7 @@ process MERGE_FINAL_CLUSTERS {
      * Wraps: bin/3_merge_clusters.py
      */
     
-    publishDir params.outdir, mode: 'move'
+    publishDir params.outdir, mode: 'copy'
     
     input:
     path hashed_csv
@@ -54,7 +54,7 @@ process EXTRACT_REPS_OF_REPS {
      * Wraps: bin/4_extract_reps_of_reps.py
      */
 
-    publishDir params.outdir, mode: 'move'
+    publishDir params.outdir, mode: 'copy'
     
     input:
     path merged_fasta

@@ -3,8 +3,8 @@ set -euo pipefail
 
 # Usage: bash scripts/run_test.sh
 # Requires: VCLUST and (optionally) THREADS as environment variables.
-# Expects vjdb1_merged_reps.fna.gz, vjdb1_merged_reps.csv and
-# vjdb1_test_full_dataset.fna.gz in the repo root.
+# Uses the test data in test_data/. The Nextflow equivalent is
+#   nextflow run main.nf -profile test
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$(dirname "$SCRIPT_DIR")"  # repo root
@@ -20,16 +20,13 @@ if [ ! -d "py3env" ]; then
 fi
 source py3env/bin/activate
 
-# --- Generate test data ---
-python3 bin/make_test_data.py
-
-echo "Test data generated. Running update pipeline..."
+# Test inputs are committed in test_data/ (regenerate with bin/make_test_data.py)
 
 # --- Clashing IDs must be rejected ---
 if python3 bin/5_prepare_update.py \
-    --new-seqs vjdb1_test_clash.fna.gz \
-    --existing-reps vjdb1_merged_reps.fna.gz \
-    --existing-csv vjdb1_merged_reps.csv \
+    --new-seqs test_data/vjdb1_test_clash.fna.gz \
+    --existing-reps test_data/vjdb1_merged_reps.fna.gz \
+    --existing-csv test_data/vjdb1_merged_reps.csv \
     --outdir "${TMPDIR}_clash" 2>/dev/null; then
     echo "FAIL: clashing ID was not rejected" >&2
     exit 1
@@ -39,9 +36,9 @@ echo "OK: clashing ID rejected"
 
 # --- Step 1: Prepare combined FASTA ---
 python3 bin/5_prepare_update.py \
-    --new-seqs vjdb1_test_new_sequences.fna.gz \
-    --existing-reps vjdb1_merged_reps.fna.gz \
-    --existing-csv vjdb1_merged_reps.csv \
+    --new-seqs test_data/vjdb1_test_new_sequences.fna.gz \
+    --existing-reps test_data/vjdb1_merged_reps.fna.gz \
+    --existing-csv test_data/vjdb1_merged_reps.csv \
     --outdir "$TMPDIR"
 
 # --- Step 2: Run vclust on combined set ---
@@ -65,7 +62,7 @@ python3 bin/6_finalize_update.py \
     --leiden-tsv "$TMPDIR/clusterreps_leiden.tsv" \
     --new-hashed-csv "$TMPDIR/new_hashed_reps.csv" \
     --combined-fasta "$COMBINED" \
-    --existing-csv vjdb1_merged_reps.csv \
+    --existing-csv test_data/vjdb1_merged_reps.csv \
     --output-prefix vjdb1_test
 
 # --- Check the expected outcome ---
