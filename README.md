@@ -21,6 +21,7 @@ nextflow run maltesie/vjdb-clustering -profile test
 or, from a clone of this repository:
 
 ```bash
+git clone https://github.com/maltesie/vjdb-clustering.git
 nextflow run main.nf -profile test
 ```
 
@@ -41,7 +42,6 @@ nextflow run maltesie/vjdb-clustering --mode initial --input vjdb.fasta.gz --out
 From a local clone, e.g. after adjusting the memory requirements in `nextflow.config` for a large dataset (see [Adjusting memory](#running-on-your-system)):
 
 ```bash
-git clone https://github.com/maltesie/vjdb-clustering.git
 nextflow run vjdb-clustering/main.nf --mode initial --input vjdb.fasta.gz --outdir results
 ```
 
@@ -82,7 +82,7 @@ nextflow run maltesie/vjdb-clustering --mode update \
     --prefix_update vjdb2 --outdir results_update
 ```
 
-From a local clone (cloned as in Phase 1):
+From a local clone:
 
 ```bash
 nextflow run vjdb-clustering/main.nf --mode update \
