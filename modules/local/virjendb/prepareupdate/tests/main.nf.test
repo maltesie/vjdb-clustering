@@ -1,0 +1,56 @@
+// TODO nf-core: Once you have added the required tests, please run the following command to build this file:
+// nf-core modules test vjdb/hashddeduplicate
+nextflow_process {
+
+    name "Test Process VIRJENDB_PREPAREUPDATE"
+    script "../main.nf"
+    process "VIRJENDB_PREPAREUPDATE"
+
+    tag "vjdb"
+    tag "vjdb/prepareupdate"
+    tag "virjendb"
+    tag "virjendb/prepareupdate"
+
+    test("vjndb update test - fna") {
+        when {
+            process {
+                // TODO - need to upload the testing files, and figure out how to set it in nf-test config file
+                """
+                input[0] = file('/home/uridavid/Code/vjdb-clustering/' + 'vjdb1_test_new_sequences.fna.gz', checkIfExists: true)
+                input[1] = file('/home/uridavid/Code/vjdb-clustering/' + 'vjdb1_merged_reps.fna.gz', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("vjndb update test - fna - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = file('/home/uridavid/Code/vjdb-clustering/' + 'vjdb1_test_new_sequences.fna.gz', checkIfExists: true)
+                input[1] = file('/home/uridavid/Code/vjdb-clustering/' + 'vjdb1_merged_reps.fna.gz', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+}
