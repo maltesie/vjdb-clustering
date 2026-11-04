@@ -26,7 +26,7 @@ fi
 source py3env/bin/activate
 
 # --- Step 1: Hash-dedup new sequences, combine with existing reps ---
-python3 bin/5_prepare_update.py \
+python3 modules/update/resources/usr/bin/5_prepare_update.py \
     --new-seqs "$NEW_SEQS" \
     --existing-reps "$EXISTING_REPS" \
     --existing-csv "$EXISTING_CSV" \
@@ -49,7 +49,7 @@ $VCLUST cluster -i "$TMPDIR/ani.tsv" -o "$TMPDIR/clusterreps_leiden.tsv" \
 rm -f "$TMPDIR/ani.tsv" "$TMPDIR/fltr.txt" "$TMPDIR/ani.ids.tsv"
 
 # --- Step 3: Remap clusters, update CSVs, extract new reps ---
-python3 bin/6_finalize_update.py \
+python3 modules/update/resources/usr/bin/6_finalize_update.py \
     --leiden-tsv "$TMPDIR/clusterreps_leiden.tsv" \
     --new-hashed-csv "$TMPDIR/new_hashed_reps.csv" \
     --combined-fasta "$COMBINED" \

@@ -7,7 +7,7 @@ Nextflow pipeline for hierarchical dereplication and clustering of the VirJenDB 
 
 ## Requirements
 
-- [Nextflow](https://www.nextflow.io/) 23.04 or newer
+- [Nextflow](https://www.nextflow.io/) 26.10 or newer
 - [micromamba](https://mamba.readthedocs.io/), which the pipeline uses to install vclust, MMseqs2, biopython and pandas from `environment.yml`. If those tools are already on your `PATH`, add `-profile no_conda` instead.
 
 ## Quick start
@@ -123,7 +123,7 @@ The updated CSV and FASTA can be used as `--existing_csv` and `--existing_reps` 
 
 ## Parameters
 
-All defaults are set in `nextflow.config`.
+Defaults are set in the `params` block of `main.nf`; `--outdir` and `--threads` are set in `nextflow.config`.
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
@@ -151,23 +151,46 @@ All defaults are set in `nextflow.config`.
   ```
 - **Adjusting memory:** the requirements are set in [`nextflow.config`](nextflow.config): the default for all processes in the `process` block, and the MMseqs2 and vclust values in the `slurm` profile. Edit them there, or override a single step in your own config, e.g. `process { withName: 'VCLUST_CLUSTER.*' { memory = '300 GB' } }`.
 - **Resuming:** add `-resume` to continue an interrupted run; finished steps are taken from the `work/` directory.
-- **Files:** results are copied to `--outdir`. Intermediate files stay in `work/`, which you can delete after a successful run.
+- **Files:** results are copied to `--outdir` (the `output` block in `main.nf`). Intermediate files stay in `work/`, which you can delete after a successful run.
+
+## Use in another pipeline
+
+With Nextflow 26.10 or newer, the pipeline can be included in another pipeline that uses static typing (`nextflow.enable.types = true`). It runs in the same run as the including pipeline, and its inputs can be process outputs:
+
+```nextflow
+include { params as VjdbParams ; workflow as VJDB_CLUSTERING } from './vjdb-clustering/main.nf'
+
+params {
+    vjdb: VjdbParams    // set on the command line as --vjdb.ani 0.9 etc.
+}
+
+workflow {
+    main:
+    vjdb = VJDB_CLUSTERING(params.vjdb + record(mode: 'initial', input: viral_fasta))
+
+    publish:
+    vjdb_clusters = vjdb.clusters_csv
+    vjdb_reps     = vjdb.reps_fasta
+}
+```
+
+The call returns the outputs of the `output` block as a record: `clusters_csv` and `reps_fasta` (both modes), and `new_clusters` and `cluster_events` (update mode, `null` in initial mode). The including pipeline publishes them itself. `nextflow.config` is not loaded in that case, so the including pipeline has to set conda (or containers) and resources, e.g. `withName: 'VJDB_CLUSTERING:.*VCLUST_CLUSTER.*'`.
 
 ## Test data
 
 `test_data/` holds a small clustering (100 clusters, 667 sequences) and inputs for an update that covers every case: new sequences, copies, a resubmission, cluster growth and a merge caused by a chimera, plus a file with a clashing ID that the update must reject.
 
-- `vjdb1_test_full_dataset.fna.gz` is a synthetic full dataset matching the test CSV (members are ~1% mutated copies of their representative), built by `bin/make_synthetic_full_dataset.py`. `-profile test_initial` clusters it and `bin/check_test_initial.py` checks that the result has the same clusters as the test CSV. Representative IDs may differ, because Leiden can pick another member as representative.
-- `vjdb1_test_new_sequences.fna.gz` and `vjdb1_test_clash.fna.gz` are built by `bin/make_test_data.py`; `bin/check_test_update.py` checks the outputs.
+- `vjdb1_test_full_dataset.fna.gz` is a synthetic full dataset matching the test CSV (members are ~1% mutated copies of their representative), built by `bin/make_synthetic_full_dataset.py`. `-profile test_initial` clusters it and `check_test_initial.py` (in `modules/test`) checks that the result has the same clusters as the test CSV. Representative IDs may differ, because Leiden can pick another member as representative.
+- `vjdb1_test_new_sequences.fna.gz` and `vjdb1_test_clash.fna.gz` are built by `bin/make_test_data.py`; `check_test_update.py` (in `modules/test`) checks the outputs.
 
 ## Repository structure
 
 ```
-main.nf            Pipeline entry point
-nextflow.config    Parameters, resources and profiles
-modules/           Nextflow processes
+main.nf            Pipeline entry point, parameters and outputs
+nextflow.config    Output directory, resources and profiles
+modules/           Nextflow processes; each module's scripts are in modules/<name>/resources/usr/bin
 environment.yml    Conda environment for all processes
-bin/               Python scripts used by the processes
+bin/               Scripts that build the test data
 test_data/         Test datasets
 scripts/           Bash reference implementation
 ```

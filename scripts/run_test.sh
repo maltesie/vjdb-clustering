@@ -23,7 +23,7 @@ source py3env/bin/activate
 # Test inputs are committed in test_data/ (regenerate with bin/make_test_data.py)
 
 # --- Clashing IDs must be rejected ---
-if python3 bin/5_prepare_update.py \
+if python3 modules/update/resources/usr/bin/5_prepare_update.py \
     --new-seqs test_data/vjdb1_test_clash.fna.gz \
     --existing-reps test_data/vjdb1_merged_reps.fna.gz \
     --existing-csv test_data/vjdb1_merged_reps.csv \
@@ -35,7 +35,7 @@ rm -rf "${TMPDIR}_clash"
 echo "OK: clashing ID rejected"
 
 # --- Step 1: Prepare combined FASTA ---
-python3 bin/5_prepare_update.py \
+python3 modules/update/resources/usr/bin/5_prepare_update.py \
     --new-seqs test_data/vjdb1_test_new_sequences.fna.gz \
     --existing-reps test_data/vjdb1_merged_reps.fna.gz \
     --existing-csv test_data/vjdb1_merged_reps.csv \
@@ -58,7 +58,7 @@ $VCLUST cluster -i "$TMPDIR/ani.tsv" -o "$TMPDIR/clusterreps_leiden.tsv" \
 rm -f "$TMPDIR/ani.tsv" "$TMPDIR/fltr.txt" "$TMPDIR/ani.ids.tsv"
 
 # --- Step 3: Finalize ---
-python3 bin/6_finalize_update.py \
+python3 modules/update/resources/usr/bin/6_finalize_update.py \
     --leiden-tsv "$TMPDIR/clusterreps_leiden.tsv" \
     --new-hashed-csv "$TMPDIR/new_hashed_reps.csv" \
     --combined-fasta "$COMBINED" \
@@ -66,6 +66,6 @@ python3 bin/6_finalize_update.py \
     --output-prefix vjdb1_test
 
 # --- Check the expected outcome ---
-python3 bin/check_test_update.py vjdb1_test
+python3 modules/test/resources/usr/bin/check_test_update.py vjdb1_test
 
 echo "Done. See vjdb1_test_new_clusters.csv and vjdb1_test_cluster_events.tsv."

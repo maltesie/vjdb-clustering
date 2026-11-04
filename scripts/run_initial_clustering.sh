@@ -22,7 +22,7 @@ source py3env/bin/activate
 mkdir -p chunks
 
 # --- Step 1: Hash-dedup and split into chunks ---
-python3 bin/1_prepare_clustering.py --input "$INPUT_FASTA"
+python3 modules/hash_dedup/resources/usr/bin/1_prepare_clustering.py --input "$INPUT_FASTA"
 
 # --- Step 2: Linclust per chunk ---
 NUM_CHUNKS=$(ls chunks/vjdb1_*.fna.gz 2>/dev/null | wc -l)
@@ -66,7 +66,7 @@ for ((i=0; i<NUM_CHUNKS; i++)); do
 done
 
 # --- Step 4: Merge chunk-level reps ---
-python3 bin/2_extract_and_merge_vclust_reps.py
+python3 modules/merge/resources/usr/bin/2_extract_and_merge_vclust_reps.py
 
 # --- Step 5: Vclust on merged reps ---
 infile="chunks/vjdb1_vclust_reps_merged.fna.gz"
@@ -85,7 +85,7 @@ $VCLUST cluster -i "$outdir/ani.tsv" -o "$outdir/clusterreps_leiden.tsv" \
 rm -f "$outdir/ani.tsv" "$outdir/fltr.txt" "$outdir/ani.ids.tsv"
 
 # --- Step 6: Final merge and extract reps ---
-python3 bin/3_merge_clusters.py
-python3 bin/4_extract_reps_of_reps.py
+python3 modules/merge/resources/usr/bin/3_merge_clusters.py
+python3 modules/merge/resources/usr/bin/4_extract_reps_of_reps.py
 
 echo "Done. Outputs: vjdb1_merged_reps.csv, vjdb1_merged_reps.fna.gz"

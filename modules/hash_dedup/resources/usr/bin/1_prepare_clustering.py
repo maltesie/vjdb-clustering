@@ -9,7 +9,7 @@ from Bio import SeqIO
 from Bio.SeqUtils import gc_fraction
 
 parser = argparse.ArgumentParser(description="Hash-deduplicate and chunk VJDB sequences.")
-parser.add_argument("--input", required=True, help="Path to input FASTA.gz")
+parser.add_argument("--input", required=True, help="Path to input FASTA (plain or gzip-compressed)")
 parser.add_argument("--outdir", default="chunks",
                     help="Output directory for chunks (default: ./chunks)")
 parser.add_argument("--block-size", type=int, default=1000000, help="Sequences per chunk (default: 1000000)")
@@ -25,7 +25,13 @@ gcs = []
 hashes = []
 out_handle = None
 
-with gzip.open(args.input, "rt") as handle:
+def open_fasta(path):
+    with open(path, "rb") as fh:
+        gzipped = fh.read(2) == b"\x1f\x8b"
+    return gzip.open(path, "rt") if gzipped else open(path)
+
+
+with open_fasta(args.input) as handle:
     for i, record in enumerate(SeqIO.parse(handle, "fasta")):
 
         if i % args.block_size == 0:
